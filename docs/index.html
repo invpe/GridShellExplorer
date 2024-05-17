@@ -112,33 +112,15 @@
                     "CPU": data.CPU,
                     "Starttime": new Date(data.Starttime * 1000).toLocaleString(),
                     "Epoch": new Date(data.Epoch * 1000).toLocaleString(),
-                    "Version": data.Version,
-                    "MaxNodesPerDevice": data.MaxNodesPerDevice,
-                    "Connections": data.Connections,
-                    "Nodes": data.Nodes,
-                    "NodesFree": data.NodesFree,
-                    "NodesWorking": data.NodesWorking,
-                    "Validators": data.Validators,
-                    "ValidatorsFree": data.ValidatorsFree,
-                    "ValidatorsWorking": data.ValidatorsWorking,
-                    "MaxNodes": data.MaxNodes,
+                    "Version": data.Version,                                        
+                    "Nodes": data.Nodes,                                        
+                    "Validators": data.Validators,                                        
                     "TV": data.TV,
                     "UsersCount": data.UsersCount,
                     "TotalBalance": data.TotalBalance,
-                    "TaskTimeout": data.TaskTimeout,
                     "Throttled": data.Throttled,
                     "TasksCount": data.TasksCount,
-                    "TasksNew": data.TasksNew,
-                    "TasksRunning": data.TasksRunning,
-                    "TasksFailed": data.TasksFailed,
-                    "TasksCompleted": data.TasksCompleted,
-                    "TasksValidated": data.TasksValidated,
                     "TotalTasks": data.TotalTasks,
-                    "TelemetryRetention": data.TelemetryRetention,
-                    "TelemetryCount": data.TelemetryCount,
-                    "TelemetryChunks": data.TelemetryChunks,
-                    "TelemetryChunksLost": data.TelemetryChunksLost,
-                    "TelemetrySize": data.TelemetrySize,
                     "Utilization": data.Utilization
                 };
 
@@ -152,7 +134,7 @@
                 function createUserRow(user) {
                     let medalsHTML = '';
                     for (const award of user.Awards) {
-                        medalsHTML += `<img class="medal" src="https://raw.githubusercontent.com/invpe/GridShellExplorer/main/docs/resources/Medal${award.Medal}.png" alt="Medal ${award.Category}">`;
+                        medalsHTML += `<img class="medal" src="https://raw.githubusercontent.com/invpe/GridShellExplorer/main/docs/resources/Medal${award.Medal}.png" alt="Medal ${award.Category}" title="Medal ${award.Category}">`;
                     }
                     return `<tr>
                                 <td>${medalsHTML}</td>
