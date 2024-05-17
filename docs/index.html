@@ -39,6 +39,19 @@
         th {
             background-color: #f2f2f2;
         }
+        .medal {
+            width: 30px;
+            height: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .expand-toggle {
+            cursor: pointer;
+        }
+        .node-row {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -58,10 +71,12 @@
                 <!-- Stats will be dynamically added here -->
             </tbody>
         </table>
+
         <h2>Volunteers</h2>
         <table>
             <thead>
                 <tr>
+                    <th>Medals</th>
                     <th>Username</th>
                     <th>Rank</th>
                     <th>Balance</th>
@@ -87,8 +102,8 @@
         fetch('https://raw.githubusercontent.com/invpe/GridShellExplorer/main/docs/current.json')
             .then(response => response.json())
             .then(data => {
-                // Function to create table rows
-                function createRow(attribute, value) {
+                // Function to create table rows for stats
+                function createStatRow(attribute, value) {
                     return `<tr><td>${attribute}</td><td>${value}</td></tr>`;
                 }
 
@@ -130,29 +145,86 @@
                 // Populate stats table
                 const statsTableBody = document.getElementById('statsTableBody');
                 for (const [attribute, value] of Object.entries(stats)) {
-                    statsTableBody.innerHTML += createRow(attribute, value);
+                    statsTableBody.innerHTML += createStatRow(attribute, value);
                 }
 
-                // Get users data
-                const users = data.Users;
-
-                // Function to create users table rows
+                // Function to create table rows for users
                 function createUserRow(user) {
+                    let medalsHTML = '';
+                    for (const award of user.Awards) {
+                        medalsHTML += `<img class="medal" src="https://raw.githubusercontent.com/invpe/GridShellExplorer/main/docs/resources/Medal${award.Medal}.png" alt="Medal ${award.Category}">`;
+                    }
                     return `<tr>
+                                <td>${medalsHTML}</td>
                                 <td>${user.Username}</td>
                                 <td>${user.Rank}</td>
                                 <td>${user.Balance}</td>
                                 <td>${user.UPF}</td>
                                 <td>${user.Totals}</td>
                                 <td>${user.Submits}</td>
-                                <td>${user.Nodes}</td>
+                                <td class="expandable-node">
+                                    <span class="expand-toggle">+</span>
+                                    <span>${user.Nodes}</span>
+                                </td>
                             </tr>`;
                 }
+
+                // Get users data
+                const users = data.Users;
 
                 // Populate users table
                 const usersTableBody = document.getElementById('usersTableBody');
                 users.forEach(user => {
                     usersTableBody.innerHTML += createUserRow(user);
+                });
+
+                // Add click event listener to expand/collapse nodes
+                const expandToggles = document.querySelectorAll('.expand-toggle');
+                expandToggles.forEach(toggle => {
+                    toggle.addEventListener('click', function() {
+                        const parentNode = toggle.parentNode;
+                        const nodesRow = parentNode.parentNode;
+                        const user = users[nodesRow.rowIndex - 1];
+                        if (toggle.textContent === '+') {
+                            const nodesList = document.createElement('tr');
+                            nodesList.classList.add('node-row');
+                            nodesList.innerHTML = `
+                                <td colspan="8">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Version</th>
+                                                <th>Task</th>
+                                                <th>Validator</th>
+                                                <th>Executor</th>
+                                                <th>TelemetryChunks</th>
+                                                <th>Availability</th>
+                                                <th>Ident</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${user.NodesList.map(node => `
+                                                <tr>
+                                                    <td>${node.Version}</td>
+                                                    <td>${node.Task}</td>
+                                                    <td>${node.Validator}</td>
+                                                    <td>${node.Executor}</td>
+                                                    <td>${node.TelemetryChunks}</td>
+                                                    <td>${node.Availability.toFixed(2)}%</td>
+                                                    <td>${node.Ident}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            `;
+                            nodesRow.parentNode.insertBefore(nodesList, nodesRow.nextSibling);
+                            toggle.textContent = '-';
+                        } else {
+                            nodesRow.nextSibling.remove();
+                            toggle.textContent = '+';
+                        }
+                    });
                 });
             })
             .catch(error => console.error('Error fetching data:', error));
